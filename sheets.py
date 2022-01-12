@@ -1,10 +1,16 @@
 from oauth2client.service_account import ServiceAccountCredentials
 from googleapiclient.discovery import build
+from pathlib import Path
 import gspread
 import logging
 import functions
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    filename='run.log',
+    encoding='utf-8',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 SCOPE = ["https://spreadsheets.google.com/feeds",
          "https://www.googleapis.com/auth/spreadsheets",
@@ -43,6 +49,10 @@ def main():
 
     else:
         functions.make_new_report(CLIENT, functions.new_report_name())
+
+    if Path('run.log').exists():
+        with open('run.log','a') as log:
+            log.write('\n')
 
 
 if __name__ == '__main__':
