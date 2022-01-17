@@ -1,6 +1,6 @@
 venv/
 .idea/
 creds.json
-'run.log'
+run.log
 invoices/
 reports/

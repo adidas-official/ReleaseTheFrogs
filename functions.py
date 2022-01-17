@@ -6,6 +6,15 @@ import months_cz
 from datetime import datetime, timedelta
 
 
+def rename_form(service):
+    forms = service.files().list(
+        q='mimeType=\'application/vnd.google-apps.form\' and name=\'Copy of template-report-form-naturaservis\'',
+        fields='files(id)'
+    ).execute()
+    form_id = forms['files'][0]['id']
+    service.files().update(fileId=form_id, body={'name':new_report_name()}).execute()
+
+
 def get_all_sheets(service):
     all_sheets = service.files().list(
         q='mimeType=\'application/vnd.google-apps.spreadsheet\'',
@@ -14,8 +23,7 @@ def get_all_sheets(service):
     sheets_dict = {}
     for s in all_sheets['files']:
         sheets_dict[s['name']] = s['id']
-    # return sheet_ids, sheet_names
-    # return all_sheets['files']
+
     return sheets_dict
 
 
@@ -161,7 +169,7 @@ def prepare_invoice(client, report, latest_invoice):
         new_invoice = client.copy('1HJIUHBL2kRhS69OTKAfQSYRVSx0_3W1SwFLIdHaUylA', invoice_num, copy_permissions=True)
 
         sheet = new_invoice.sheet1
-        logging.info('Populating data.')
+        logging.info('Populating data. [REMOTE]')
         sheet.update('A1', f'Faktura č.{invoice_num}')
         sheet.update('B21', str(issue_date))
         sheet.update('B22', str(duedate))

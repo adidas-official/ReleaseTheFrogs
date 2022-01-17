@@ -4,10 +4,10 @@ from pathlib import Path
 import gspread
 import logging
 import functions
+import time
 
 logging.basicConfig(
-    filename='run.log',
-    encoding='utf-8',
+    # filename='run.log',
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S')
@@ -32,7 +32,7 @@ def main():
         hours = functions.get_hours(CLIENT.open(latest_report[0]))
         if hours != '0':
 
-            logging.info('Checking for existing reports')
+            logging.info('Checking for existing reports [REMOTE]')
             if latest_report[0] not in list(sheets.keys()):
                 functions.make_new_report(CLIENT, functions.new_report_name())
             else:
@@ -49,6 +49,8 @@ def main():
 
     else:
         functions.make_new_report(CLIENT, functions.new_report_name())
+        time.sleep(5)
+        functions.rename_form(DRIVE_SERVICE)
 
     if Path('run.log').exists():
         with open('run.log','a') as log:
