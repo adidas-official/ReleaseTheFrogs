@@ -33,8 +33,11 @@ def main():
         if hours != '0':
 
             logging.info('Checking for existing reports [REMOTE]')
-            if latest_report[0] not in list(sheets.keys()):
-                functions.make_new_report(CLIENT, functions.new_report_name())
+            new_report_name = functions.new_report_name()
+            # logging.info(new_report_name)
+            if new_report_name not in list(sheets.keys()):
+                functions.make_new_report(CLIENT, new_report_name)
+                functions.rename_form(DRIVE_SERVICE, new_report_name)
             else:
                 logging.info(f'Report {latest_report[0]} already exists [REMOTE]')
 

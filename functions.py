@@ -6,13 +6,14 @@ import months_cz
 from datetime import datetime, timedelta
 
 
-def rename_form(service):
+def rename_form(service, new_report_name):
     forms = service.files().list(
         q='mimeType=\'application/vnd.google-apps.form\' and name=\'Copy of template-report-form-naturaservis\'',
         fields='files(id)'
     ).execute()
     form_id = forms['files'][0]['id']
-    service.files().update(fileId=form_id, body={'name':new_report_name()}).execute()
+    logging.info(f'Renaming form to correct name: {new_report_name} [REMOTE]')
+    service.files().update(fileId=form_id, body={'name':new_report_name}).execute()
 
 
 def get_all_sheets(service):
