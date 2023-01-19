@@ -7,7 +7,6 @@ import functions
 import time
 
 logging.basicConfig(
-    filename='run.log',
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S')
@@ -56,7 +55,7 @@ def main():
         functions.rename_form(DRIVE_SERVICE)
 
     if Path('run.log').exists():
-        with open('run.log','a') as log:
+        with open('run.log', 'a') as log:
             log.write('\n')
 
 

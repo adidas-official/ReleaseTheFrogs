@@ -4,6 +4,7 @@ import re
 import requests
 import months_cz
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 def rename_form(service, new_report_name):
@@ -13,12 +14,13 @@ def rename_form(service, new_report_name):
     ).execute()
     form_id = forms['files'][0]['id']
     logging.info(f'Renaming form to correct name: {new_report_name} [REMOTE]')
-    service.files().update(fileId=form_id, body={'name':new_report_name}).execute()
+    service.files().update(fileId=form_id, body={'name': new_report_name}).execute()
 
 
 def get_all_sheets(service):
     all_sheets = service.files().list(
-        q='mimeType=\'application/vnd.google-apps.spreadsheet\'',
+        spaces='drive',
+        q='mimeType=\'application/vnd.google-apps.spreadsheet\' and parents in \'1WIifQderN4MQ5gqyDtj3L6svIj7S6aHk\'',
         fields='files(id, name)').execute()
 
     sheets_dict = {}
@@ -155,13 +157,14 @@ def prepare_invoice(client, report, latest_invoice):
         previous_invoice_data = check_loger(client, latest_invoice)
 
     # formating total cost to format 12 345,00
-    total = 150 * float(hours)
+    total = 220 * float(hours)
     total = f'{total:,.2f}'
     total = total.replace(',', ' ').replace('.', ',')
 
     hours = str(hours).replace('.', ',')
     issue_date = datetime.now().strftime('%d.%m.%Y')
-    duedate = (datetime.now() + timedelta(days=14)).strftime('%d.%m.%Y')
+    # duedate = (datetime.now() + timedelta(months=14)).strftime('%d.%m.%Y')
+    duedate = (datetime.now() + relativedelta(months=1)).strftime('%d.%m.%Y')
     current_invoice_data = [latest_invoice, issue_date, duedate, hours, total]
 
     logging.info(f'Checking for duplicite invoice document [REMOTE]')
