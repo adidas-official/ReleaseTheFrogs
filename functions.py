@@ -7,14 +7,27 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 
-def rename_form(service, new_report_name):
-    forms = service.files().list(
+def rename_form(service_files, service_forms, new_report_name):
+    forms = service_files.files().list(
         q='mimeType=\'application/vnd.google-apps.form\' and name=\'Copy of template-report-form-naturaservis\'',
         fields='files(id)'
     ).execute()
     form_id = forms['files'][0]['id']
     logging.info(f'Renaming form to correct name: {new_report_name} [REMOTE]')
-    service.files().update(fileId=form_id, body={'name': new_report_name}).execute()
+
+    service_files.files().update(fileId=form_id, body={'name': new_report_name}).execute()
+    update = {
+        "requests": [{
+            "updateFormInfo": {
+                "info": {
+                    "title": new_report_name
+                },
+                "updateMask": "title"
+            }
+        }]
+    }
+    logging.info(f'Renaming form title to {new_report_name}')
+    service_forms.forms().batchUpdate(formId=form_id, body=update).execute()
 
 
 def get_all_sheets(service):

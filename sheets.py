@@ -20,6 +20,7 @@ CREDS = ServiceAccountCredentials.from_json_keyfile_name('creds.json', SCOPE)
 ACCESS_TOKEN = CREDS.get_access_token().access_token
 CLIENT = gspread.authorize(CREDS)
 DRIVE_SERVICE = build('drive', 'v3', credentials=CREDS)
+FORM_SERVICE = build('forms', 'v1', credentials=CREDS)
 
 
 def main():
@@ -33,10 +34,9 @@ def main():
 
             logging.info('Checking for existing reports [REMOTE]')
             new_report_name = functions.new_report_name()
-            # logging.info(new_report_name)
             if new_report_name not in list(sheets.keys()):
                 functions.make_new_report(CLIENT, new_report_name)
-                functions.rename_form(DRIVE_SERVICE, new_report_name)
+                functions.rename_form(DRIVE_SERVICE, FORM_SERVICE, new_report_name)
             else:
                 logging.info(f'Report {latest_report[0]} already exists [REMOTE]')
 
@@ -50,9 +50,10 @@ def main():
             logging.warning('No hours in last report [REMOTE]')
 
     else:
-        functions.make_new_report(CLIENT, functions.new_report_name())
+        new_report_name = functions.new_report_name()
+        functions.make_new_report(CLIENT, new_report_name)
         time.sleep(5)
-        functions.rename_form(DRIVE_SERVICE)
+        functions.rename_form(DRIVE_SERVICE, FORM_SERVICE, new_report_name)
 
     if Path('run.log').exists():
         with open('run.log', 'a') as log:
